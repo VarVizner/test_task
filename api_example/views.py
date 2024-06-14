@@ -29,6 +29,7 @@ def import_from_excel(request):
 def ApiOverview(request):
     api_urls = {
         'Upload_excel_file': '/upload_excel',
+        'Search by params(category/section/name)': '/category=category_example',
         'All_items': '/all',
         'Add': '/add',
         'Update': '/update/code',
