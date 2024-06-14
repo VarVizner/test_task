@@ -15,9 +15,10 @@ def import_from_excel(request):
 
         for el in ws.iter_rows(min_row=2, values_only=True):
             section, category, code, name, price = el
-            Elements.objects.create(section=section, category=category,
-                                    code=code, name=name,
-                                    price=price)
+            if not Elements.objects.filter(**request.data).exists():
+                Elements.objects.create(section=section, category=category,
+                                        code=code, name=name,
+                                        price=price)
 
         return render(request, "success.html")
 
@@ -27,27 +28,29 @@ def import_from_excel(request):
 @api_view(['GET'])
 def ApiOverview(request):
     api_urls = {
+        'Upload_excel_file': '/upload_excel',
         'All_items': '/all',
         'Add': '/add',
-        'Update': '/update/pk',
-        'Delete': '/delete/pk'
+        'Update': '/update/code',
+        'Delete': '/delete/code'
     }
 
     return Response(api_urls)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def add_element(request):
     element = ElementsSerializer(data=request.data)
+
+    if not element.is_valid():
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     if Elements.objects.filter(**request.data).exists():
         raise serializers.ValidationError('This element already exists')
 
-    if element.is_valid():
-        element.save()
-        return Response(element.data)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    element.save()
+    return Response(element.data)
+
 
 
 @api_view(['GET'])
@@ -66,8 +69,8 @@ def view_elements(request):
 
 
 @api_view(['GET', 'PUT'])
-def update_element(request, pk):
-    element = Elements.objects.get(pk=pk)
+def update_element(request, code):
+    element = get_object_or_404(Elements, code=code)
     data = ElementsSerializer(instance=element, data=request.data)
 
     if data.is_valid():
@@ -77,11 +80,11 @@ def update_element(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['GET', 'DELETE'])
-def delete_element(request, pk):
-    element = get_object_or_404(Elements, pk=pk)
+@api_view(['DELETE'])
+def delete_element(request, code):
+    element = get_object_or_404(Elements, code=code)
     element.delete()
-    return Response(status=status.HTTP_202_ACCEPTED)
+    return Response(status=status.HTTP_200_OK)
 
 
 

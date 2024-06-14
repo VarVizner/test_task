@@ -7,6 +7,6 @@ urlpatterns = [
     path('upload_excel/', views.import_from_excel, name='upload_excel'),
     path('add/', views.add_element, name="add_element"),
     path('all/', views.view_elements, name='view_elements'),
-    path('update/<int:pk>/', views.update_element, name='update_element'),
-    path('delete/<int:pk>/', views.delete_element, name='delete_element')
+    path('update/<int:code>/', views.update_element, name='update_element'),
+    path('delete/<int:code>/', views.delete_element, name='delete_element')
 ]
