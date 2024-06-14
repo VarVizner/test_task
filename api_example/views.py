@@ -15,7 +15,7 @@ def import_from_excel(request):
 
         for el in ws.iter_rows(min_row=2, values_only=True):
             section, category, code, name, price = el
-            if not Elements.objects.filter(**request.data).exists():
+            if not Elements.objects.filter(code=code).exists():
                 Elements.objects.create(section=section, category=category,
                                         code=code, name=name,
                                         price=price)
